@@ -1,0 +1,36 @@
+# Here you can define all your data sets by using simple YAML syntax.
+#
+# Documentation for this file format can be found in "The Data Catalog"
+# Link: https://kedro.readthedocs.io/en/stable/data/data_catalog.html
+#
+# We support interacting with a variety of data stores including local file systems, cloud, network and HDFS
+#
+# The Data Catalog supports being able to reference the same file using two different DataSet implementations
+# (transcoding), templating and a way to reuse arguments that are frequently repeated. See more here:
+# https://kedro.readthedocs.io/en/stable/data/data_catalog.html
+#
+
+
+chicago_crimes:
+  type: spark.SparkDataSet
+  filepath: "data/01_raw/Crimes_-_2001_to_Present.csv"
+  file_format: csv
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    sep: '|'
+    header: True
+
+group_crimes_by_year_output:
+  type: pandas.CSVDataSet
+  filepath: "data/02_intermediate/crimes_count_by_year.csv"
+
+location_crimes_output:
+  type: pandas.CSVDataSet
+  filepath: "data/02_intermediate/location_crimes.csv"
+
+arrest_overtime_output:
+  type: pandas.CSVDataSet
+  filepath: "data/02_intermediate/arrest_over_time.csv"
+
