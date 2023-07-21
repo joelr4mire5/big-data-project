@@ -22,6 +22,20 @@ chicago_crimes:
     sep: '|'
     header: True
 
+
+community_areas:
+  type: spark.SparkDataSet
+  filepath: "data/01_raw/CommAreas.csv"
+  file_format: csv
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    sep: '|'
+    header: True
+
+
+
 group_crimes_by_year_output:
   type: pandas.CSVDataSet
   filepath: "data/02_intermediate/crimes_count_by_year.csv"

@@ -2,8 +2,15 @@
 This is a boilerplate pipeline 'dataprocessing'
 generated using Kedro 0.18.11
 """
+from matplotlib import pyplot
 from pyspark.sql.functions import col,countDistinct,expr
 import matplotlib.pyplot as plt
+
+import folium
+from shapely.geometry import Polygon
+from selenium import webdriver
+import geopandas as gpd
+import pandas as pd
 
 
 def top_crimes(df):
@@ -39,8 +46,8 @@ def group_crimes_by_year(filtered_crimes_new):
         plt.plot(df_subset["Year"], df_subset["count"], label=primary_type)
         plt.legend(loc="upper right", bbox_to_anchor=(1.05, 1))
 
-    # Show the chart
-    plt.savefig("data/08_reporting/crime_timeline.png")
+    plt.show()
+
 
 
     return filtered_crimes_grouped
@@ -63,9 +70,46 @@ def arrest_overtime(df):
 
     return df
 
-def criminal_locations(df):
-    df = df.groupby("Primary_Type", "Year","Location_Description" ,"Latitude","Longitude").agg(countDistinct("Case_Number"))
 
-    return df
+
+
+def criminal_locations(crimes,Comm_area):
+    Comm_area=Comm_area.select("Community_Area","COMMUNITY","the_geom")
+
+    crimes = crimes.filter(crimes.Community_Area.isNotNull())
+
+    crimes = crimes.groupby("Primary_Type", "Year","Location_Description","Community_Area","Location").agg(countDistinct("Case_Number"))
+    crimes=crimes.join(Comm_area,["Community_Area"],"left")
+
+
+    return crimes
+
+
+
+def draw_map(crimes):
+
+    crimes=crimes.groupby("Community_Area").agg(countDistinct("Case_Number"))
+    crimes=crimes.toPandas()
+    crimes=crimes.dropna()
+    crimes['Community_Area']=crimes['Community_Area'].astype(int)
+    crimes['Danger_Level'] = pd.qcut(crimes["count(Case_Number)"], q=4, labels=['Low danger', 'Low mid danger', 'High mid danger', 'High danger'])
+    print(crimes)
+
+    crimes=crimes.rename(columns={"Community_Area":"area_numbe"})
+
+
+    gdf = gpd.read_file("/home/david/Documents/Pyspark_Projects/big-data-project/data/01_raw/Boundaries - Community Areas (current).geojson")
+
+    gdf['area_numbe'] = gdf['area_numbe'].astype(str)
+    crimes['area_numbe'] = crimes['area_numbe'].astype(str)
+
+    gdf=gdf.merge(crimes, on='area_numbe', how='left')
+
+    gdf.plot(column='Danger_Level',cmap='coolwarm',legend=True)
+    plt.show()
+
+    return gdf
+
+
 
 

@@ -7,6 +7,10 @@ from kedro.pipeline import Pipeline, node, pipeline
 
 from .nodes import *
 
+from kedro.config import ConfigLoader
+from kedro.framework.project import settings
+
+
 
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline([
@@ -54,10 +58,10 @@ def create_pipeline(**kwargs) -> Pipeline:
             name="arrest_overtime_node"
         ),
         node(
-            func=criminal_locations,
-            inputs="chicago_crimes_renamed_output",
-            outputs="criminal_locations_output",
-            name="criminal_locations_node"
+            func=draw_map,
+            inputs=["chicago_crimes_renamed_output"],
+            outputs="map_output",
+            name="maps_node"
         ),
 
 
