@@ -48,4 +48,8 @@ arrest_overtime_output:
   type: pandas.CSVDataSet
   filepath: "data/02_intermediate/arrest_over_time.csv"
 
+clustering_model_output:
+  type: pandas.CSVDataSet
+  filepath: "data/07_model_output/kmeans_output.csv"
+
 
