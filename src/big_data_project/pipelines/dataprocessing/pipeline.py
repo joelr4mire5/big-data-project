@@ -63,6 +63,12 @@ def create_pipeline(**kwargs) -> Pipeline:
             outputs="map_output",
             name="maps_node"
         ),
+        node(
+            func=group_crimes_by_month,
+            inputs=["chicago_crimes_renamed_output"],
+            outputs="group_crimes_by_month_output",
+            name="group_crimes_by_month_node"
+        ),
 
 
     ])

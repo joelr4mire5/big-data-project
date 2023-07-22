@@ -3,7 +3,8 @@ This is a boilerplate pipeline 'dataprocessing'
 generated using Kedro 0.18.11
 """
 from matplotlib import pyplot
-from pyspark.sql.functions import col,countDistinct,expr
+from matplotlib.dates import DateFormatter
+from pyspark.sql.functions import col, countDistinct, expr, to_timestamp, month, to_date, date_format, year
 import matplotlib.pyplot as plt
 
 import folium
@@ -52,6 +53,30 @@ def group_crimes_by_year(filtered_crimes_new):
 
     return filtered_crimes_grouped
 
+def group_crimes_by_month(df):
+
+    df = df.withColumn("timestamp_column", to_date(col("Date"), "dd/MM/yyyy hh:mm:ss a"))
+    df = df.withColumn("MonthYear", date_format(col("timestamp_column"), "MM/yyyy"))
+    df=df.groupby("MonthYear").agg(countDistinct("Case_Number"))
+    df=df.toPandas()
+    df["MonthYear"] = pd.to_datetime(df["MonthYear"] , format='%m/%Y')
+    df.dropna(inplace=True)
+    df=df.sort_values(by='MonthYear')
+
+    plt.plot(df["MonthYear"], df["count(Case_Number)"], marker='o', linestyle='-')
+
+    date_formatting = DateFormatter("%b %Y")
+    plt.gca().xaxis.set_major_formatter(date_formatting)
+    plt.xticks(rotation=45, ha='right')
+
+    # Add labels and title
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.title('Date with Format "Month Year" on X-axis')
+    plt.show()
+
+    return df
+
 
 
 def location_crimes(crimes_df):
@@ -70,6 +95,12 @@ def arrest_overtime(df):
 
     return df
 
+
+def chicago_crime_cluster():
+
+
+
+    return None
 
 
 
