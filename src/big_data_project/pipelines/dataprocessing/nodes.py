@@ -95,28 +95,6 @@ def arrest_overtime(df):
 
     return df
 
-
-def chicago_crime_cluster():
-
-
-
-    return None
-
-
-
-def criminal_locations(crimes,Comm_area):
-    Comm_area=Comm_area.select("Community_Area","COMMUNITY","the_geom")
-
-    crimes = crimes.filter(crimes.Community_Area.isNotNull())
-
-    crimes = crimes.groupby("Primary_Type", "Year","Location_Description","Community_Area","Location").agg(countDistinct("Case_Number"))
-    crimes=crimes.join(Comm_area,["Community_Area"],"left")
-
-
-    return crimes
-
-
-
 def draw_map(crimes):
 
     crimes=crimes.groupby("Community_Area").agg(countDistinct("Case_Number"))
